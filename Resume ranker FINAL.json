@@ -1,0 +1,927 @@
+{
+  "name": "Resume ranker",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "n8n-nodes-rooyai-chat.rooyaiChatModel",
+      "typeVersion": 1,
+      "position": [
+        16,
+        176
+      ],
+      "id": "058ab34f-4650-4040-903b-bcb490588e61",
+      "name": "Rooyai Chat Model",
+      "credentials": {
+        "rooyaiApi": {
+          "id": "GaXC7qSD9wtWZ5US",
+          "name": "Z1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "n8n-nodes-rooyai-chat.rooyaiChatModel",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        208
+      ],
+      "id": "dad43f2a-6bb1-44d5-9280-21f165ee59ad",
+      "name": "Rooyai Chat Model1",
+      "credentials": {
+        "rooyaiApi": {
+          "id": "GaXC7qSD9wtWZ5US",
+          "name": "Z1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "n8n-nodes-rooyai-chat.rooyaiChatModel",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        -384
+      ],
+      "id": "fcf02364-3067-4186-9ab4-9c097391ec84",
+      "name": "Rooyai Chat Model2",
+      "credentials": {
+        "rooyaiApi": {
+          "id": "GaXC7qSD9wtWZ5US",
+          "name": "Z1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -2032,
+        16
+      ],
+      "id": "9dea207b-03dc-4e89-9222-9973f5ad7f2e",
+      "name": "Telegram Trigger",
+      "webhookId": "b6cb276a-a61d-442d-978a-03972dff4479",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y7scpMjPjTlLqbTj",
+          "name": "resume ranker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1216,
+        192
+      ],
+      "id": "64ac8f9b-dea8-42b7-8f44-55e1b2d47c0d",
+      "name": "Get a file",
+      "webhookId": "64b5cf82-66fe-4522-a13a-f275a0dfcb95",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y7scpMjPjTlLqbTj",
+          "name": "resume ranker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    job_description: `Sales Development Representative (SDR)\n\nWe are a healthcare technology company looking for a Sales Development Representative to join our team.\n\nRequirements:\n- 1+ year of SDR or high-volume outbound sales experience\n- Proven ability to make 130–150+ calls per day while maintaining quality conversations\n- Excellent verbal and written English communication skills with minimal accent\n- Ability to follow structured sales processes and scripts\n- Experience using Salesforce or similar CRM platforms\n- Comfortable working full-time U.S. Eastern Time hours\n- Strong resilience, consistency, and self-motivation\n\nNice to Have:\n- Experience in healthcare, nursing home, or long-term care sales\n- Experience with Dialpad or cloud-based calling platforms\n- Experience with lead enrichment, prospecting, or AI-powered sales tools\n- Experience working in remote structured SDR teams\n- Experience with coaching, role-playing, or performance-based sales environments`,\n\n    candidate_name:\n      item.json.result?.file_path?.split('/').pop()?.replace(/\\.[^/.]+$/, '') ||\n      'Telegram Resume'\n  },\n\n  binary: item.binary\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -992,
+        208
+      ],
+      "id": "78963140-07eb-4593-847d-882f3c259d3f",
+      "name": "Telegram - Prepare Resume"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "YqaPxBHStBqjsJ7E",
+          "mode": "list",
+          "cachedResultName": "Telegram Resume Intake",
+          "cachedResultUrl": "/projects/Re8twjMZvZp0PsRa/datatables/YqaPxBHStBqjsJ7E"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "candidate_name": "={{ $json.candidate_name }}",
+            "resume_text": "={{ $json.resume_text }}",
+            "job_description": "={{ $json.job_description }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "candidate_name",
+              "displayName": "candidate_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "resume_text",
+              "displayName": "resume_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "job_description",
+              "displayName": "job_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        224
+      ],
+      "id": "d197be22-115a-422a-a4a4-7b3bad6739e7",
+      "name": "Telegram - Store Resume"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const message = $json.message ?? {};\n\nreturn {\n  json: {\n    chat_id: message.chat?.id ?? null,\n    is_done: message.text?.trim().toLowerCase() === '/done',\n    message_type: message.document ? 'resume' : 'text'\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1856,
+        16
+      ],
+      "id": "bb77c989-41d6-4e2c-af88-079e148ad679",
+      "name": "Telegram - Check Done"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6c885c26-f776-47c8-b2c0-1439e53f2936",
+              "leftValue": "={{ $json.is_done }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1568,
+        -96
+      ],
+      "id": "0dae626f-cc9e-49c4-919d-b65ab701b3e5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst candidates = data.ranked_candidates || [];\n\nconst rows = candidates.map((c, i) => {\n  const y = 270 + (i * 90);\n\n  return `\n    <text x=\"80\" y=\"${y}\" font-size=\"28\" font-family=\"Arial\" font-weight=\"bold\">\n      ${i + 1}.\n    </text>\n\n    <text x=\"140\" y=\"${y}\" font-size=\"28\" font-family=\"Arial\">\n      ${c.candidate_name}\n    </text>\n\n    <text x=\"820\" y=\"${y}\" font-size=\"28\" font-family=\"Arial\"\n          font-weight=\"bold\" text-anchor=\"end\">\n      ${c.fit_score}%\n    </text>\n  `;\n}).join('');\n\nconst top = candidates[0];\n\nconst svg = `\n<svg xmlns=\"http://www.w3.org/2000/svg\"\n     width=\"900\"\n     height=\"${380 + candidates.length * 90}\">\n\n  <rect width=\"100%\" height=\"100%\" fill=\"#ffffff\"/>\n\n  <text x=\"60\" y=\"70\"\n        font-size=\"38\"\n        font-family=\"Arial\"\n        font-weight=\"bold\">\n    Resume Screening\n  </text>\n\n  <text x=\"60\" y=\"110\"\n        font-size=\"20\"\n        font-family=\"Arial\">\n    ${data.job_title || 'Candidate Ranking'}\n  </text>\n\n  <rect x=\"50\" y=\"140\"\n        width=\"800\"\n        height=\"100\"\n        rx=\"20\"\n        fill=\"#f3f4f6\"/>\n\n  <text x=\"80\" y=\"175\"\n        font-size=\"18\"\n        font-family=\"Arial\">\n    TOP RECOMMENDATION\n  </text>\n\n  <text x=\"80\" y=\"215\"\n        font-size=\"30\"\n        font-family=\"Arial\"\n        font-weight=\"bold\">\n    ${top?.candidate_name || 'N/A'}\n  </text>\n\n  <text x=\"820\" y=\"215\"\n        font-size=\"30\"\n        font-family=\"Arial\"\n        font-weight=\"bold\"\n        text-anchor=\"end\">\n    ${top?.fit_score ?? 0}%\n  </text>\n\n  ${rows}\n\n  <text x=\"450\"\n        y=\"${350 + candidates.length * 90}\"\n        font-size=\"16\"\n        font-family=\"Arial\"\n        text-anchor=\"middle\"\n        fill=\"#777\">\n    Based on submitted resume evidence\n  </text>\n\n</svg>\n`;\n\nreturn [\n  {\n    json: {\n      ...data,\n      summary_svg: svg\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        -640
+      ],
+      "id": "a84591ad-7f90-4389-9ef5-0dcbe419877f",
+      "name": "13 - Create Exact Summary SVG"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst svg = data.summary_svg;\n\nif (!svg) {\n  throw new Error('summary_svg is missing');\n}\n\nconst cleanSvg = svg\n  .replace(/^\\uFEFF/, '')\n  .trim();\n\nif (!cleanSvg.startsWith('<svg')) {\n  throw new Error('Invalid SVG: opening <svg> tag not found');\n}\n\nif (!cleanSvg.endsWith('</svg>')) {\n  throw new Error('Invalid SVG: closing </svg> tag not found');\n}\n\nconst binaryData = await this.helpers.prepareBinaryData(\n  Buffer.from(cleanSvg, 'utf8'),\n  'resume-screening-summary.svg',\n  'image/svg+xml'\n);\n\nreturn [\n  {\n    json: {\n      ...data\n    },\n    binary: {\n      data: binaryData\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -640
+      ],
+      "id": "68db817a-4be2-4b8e-bf80-1deaf048af58",
+      "name": "14 - SVG to Binary"
+    },
+    {
+      "parameters": {
+        "resource": "export",
+        "templateBinaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@officina-musci/n8n-nodes-svg-processor.svgProcessor",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        -640
+      ],
+      "id": "f58a4376-dbab-4479-908f-3a75378ced17",
+      "name": "Convert SVG to PDF"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "=data",
+        "pageRange": "1"
+      },
+      "type": "@bitovi/n8n-nodes-pdf-to-png.pdfToPng",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        -640
+      ],
+      "id": "e1e9a3a2-ad02-431d-bb49-ab9c74180409",
+      "name": "PDF to PNG"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -752,
+        208
+      ],
+      "id": "30119606-25a1-4396-8d3a-f04d7137fd9f",
+      "name": "Extract Resume Text"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\nconst prepare = $('Telegram - Prepare Resume').first();\n\nconst resumeText = item.json.text || '';\n\nconst lines = resumeText\n  .split('\\n')\n  .map(line => line.trim())\n  .filter(line => line.length > 0);\n\n// Common resume section headings that are NOT names\nconst excludedHeadings = new Set([\n  'EDUCATION',\n  'CONTACT',\n  'CONTACT INFORMATION',\n  'WORK EXPERIENCE',\n  'EXPERIENCE',\n  'PROFESSIONAL EXPERIENCE',\n  'SKILLS',\n  'SUMMARY',\n  'PROFESSIONAL SUMMARY',\n  'PROFILE',\n  'OBJECTIVE',\n  'CERTIFICATIONS',\n  'PROJECTS',\n  'LANGUAGES',\n  'REFERENCES',\n  'ACHIEVEMENTS',\n  'INTERESTS',\n  'ABOUT ME'\n]);\n\nfunction looksLikeName(line) {\n  const normalized = line\n    .replace(/[|•·]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\n  if (!normalized) return false;\n\n  // Reject obvious section headings\n  if (excludedHeadings.has(normalized.toUpperCase())) {\n    return false;\n  }\n\n  // Reject lines that are mostly contact information\n  if (/@|https?:\\/\\/|www\\.|linkedin|github|\\.com\\b|\\+?\\d[\\d\\s().-]{6,}/i.test(normalized)) {\n    return false;\n  }\n\n  // Reject very long lines\n  if (normalized.length > 60) {\n    return false;\n  }\n\n  // A likely name should contain mostly letters/spaces\n  const letters = (normalized.match(/[A-Za-zÀ-ÿ]/g) || []).length;\n  const digits = (normalized.match(/\\d/g) || []).length;\n\n  if (letters < 3 || digits > 0) {\n    return false;\n  }\n\n  // Usually 2–5 words\n  const words = normalized.split(/\\s+/);\n\n  if (words.length < 2 || words.length > 5) {\n    return false;\n  }\n\n  return true;\n}\n\n// Search the first 20 meaningful lines for a likely candidate name\nlet candidateName = null;\n\nfor (const line of lines.slice(0, 20)) {\n  if (looksLikeName(line)) {\n    candidateName = line;\n    break;\n  }\n}\n\n// Fallback: keep the first line only if nothing better was found\nif (!candidateName) {\n  candidateName = lines[0] || null;\n}\n\nreturn [\n  {\n    json: {\n      chat_id: $('Telegram Trigger').first().json.message.chat.id,\n      candidate_name: candidateName,\n      resume_text: resumeText,\n      job_description: prepare.json.job_description\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        224
+      ],
+      "id": "159ce8f8-9442-47bc-a838-217d5234aa25",
+      "name": "Build Resume Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst resumes = items.map(item => ({\n  candidate_name: item.json.candidate_name,\n  resume_text: item.json.resume_text\n}));\n\nreturn [\n  {\n    json: {\n      job_description: items[0]?.json.job_description ?? null,\n      resumes\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        0
+      ],
+      "id": "7983a6f2-ca20-424b-bce7-f7b58a3c65b0",
+      "name": "Build Input Data"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YqaPxBHStBqjsJ7E",
+          "mode": "list",
+          "cachedResultName": "Telegram Resume Intake",
+          "cachedResultUrl": "/projects/Re8twjMZvZp0PsRa/datatables/YqaPxBHStBqjsJ7E"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "chat_id",
+              "keyValue": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1136,
+        0
+      ],
+      "id": "8bb395f9-ce06-4d47-883b-0b1f46e34d4c",
+      "name": "Get Stored Resumes"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this Job Description and extract the hiring criteria.\n\nJob Description:\n\n{{ $json.job_description }}\n\nReturn ONLY valid JSON.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a strict Job Description criteria extractor.\n\nYour task is to extract hiring criteria from ONE provided Job Description.\n\nThe Job Description is the ONLY source of truth.\n\nDo not use outside knowledge.\nDo not invent requirements.\nDo not infer unstated requirements.\nDo not remove, rewrite, or weaken requirements.\n\n---\n\n# 1. EXTRACT THE JOB CRITERIA\n\nExtract:\n\n* job title\n* seniority\n* industry\n* required years of experience\n* must-have skills\n* nice-to-have skills\n* education\n* certifications\n* soft skills\n* location or timezone requirements\n\nPreserve the original wording of requirements whenever possible.\n\nDo not change numbers, thresholds, conditions, or meaning.\n\n---\n\n# 2. MUST-HAVE SKILLS\n\n`must_have_skills` must contain requirements that the Job Description presents as required, mandatory, or part of the main Requirements section.\n\nCopy each requirement as a complete criterion.\n\nDo not split one criterion into multiple criteria.\n\nDo not merge separate criteria.\n\n---\n\n# 3. NICE-TO-HAVE SKILLS\n\n`nice_to_have_skills` must contain requirements explicitly presented as:\n\n* Nice to Have\n* Preferred\n* Bonus\n* Preferred Qualifications\n\nDo not move a nice-to-have requirement into must-have.\n\n---\n\n# 4. SOFT SKILLS\n\n`soft_skills` is a classification field.\n\nExtract requirements that describe personal, behavioral, communication, or interpersonal qualities.\n\nExamples include:\n\n* resilience\n* consistency\n* self-motivation\n* communication\n* adaptability\n* teamwork\n* leadership\n* problem solving\n* relationship building\n\nA soft skill may also appear in `must_have_skills` or `nice_to_have_skills`.\n\nThis is intentional.\n\nFor example, if the Job Description says:\n\n\"Strong resilience, consistency, and self-motivation\"\n\nas a required qualification, then:\n\n`must_have_skills` MUST contain:\n\n\"Strong resilience, consistency, and self-motivation\"\n\nAND\n\n`soft_skills` MUST contain:\n\n\"Strong resilience, consistency, and self-motivation\"\n\nDo not remove it from `must_have_skills` just because it is also a soft skill.\n\nDo not invent additional soft skills.\n\n---\n\n# 5. COMMUNICATION REQUIREMENTS\n\nClassify communication-related requirements as soft skills when appropriate.\n\nFor example:\n\n\"Excellent verbal and written English communication skills\"\n\nmay appear in both:\n\n* `must_have_skills`\n* `soft_skills`\n\nHowever, preserve the complete original criterion in `must_have_skills`.\n\nDo not create a shortened version such as:\n\n\"communication skills\"\n\nunless that exact wording is present in the Job Description.\n\n---\n\n# 6. LOCATION / TIMEZONE\n\nPut explicit working-location or timezone requirements into:\n\n`location_or_timezone`\n\nExamples:\n\n* U.S. Eastern Time\n* EST\n* CST\n* remote within the United States\n* willing to work specific hours\n\nDo not infer timezone requirements from a company's location or from remote work.\n\n---\n\n# 7. EXPERIENCE\n\nExtract the minimum required years only when explicitly stated.\n\nExample:\n\n\"1+ year of SDR experience\"\n\n→ `years_of_experience`: 1\n\nIf no minimum experience requirement is explicitly stated:\n\n→ `years_of_experience`: null\n\nDo not infer years from seniority.\n\n---\n\n# 8. SENIORITY\n\nExtract seniority only when explicitly stated.\n\nExamples:\n\n* Junior\n* Mid-level\n* Senior\n* Manager\n* Director\n\nOtherwise:\n\n`seniority`: null\n\n---\n\n# 9. INDUSTRY\n\nExtract the industry exactly as it is explicitly described in the Job Description.\n\nIf the Job Description describes a combined or specific industry using multiple words, preserve the complete phrase.\n\nExample:\n\n\"healthcare technology company\"\n\n→ `industry`: [\"healthcare technology\"]\n\nDo NOT reduce:\n\n\"healthcare technology\"\n\nto:\n\n\"healthcare\"\n\nDo NOT split a specific industry phrase into broader categories.\n\nDo not infer an industry from unrelated context.\n\n---\n\n# 10. EDUCATION\n\nOnly include explicitly stated educational requirements.\n\nIf none:\n\n`education`: []\n\n---\n\n# 11. CERTIFICATIONS\n\nOnly include explicitly stated certification requirements.\n\nIf none:\n\n`certifications`: []\n\n---\n\n# 12. EXACT CRITERIA\n\nEvery requirement should remain complete and understandable on its own.\n\nDo not:\n\n* paraphrase numbers\n* remove qualifiers\n* remove conditions\n* combine unrelated requirements\n* invent requirements\n* translate requirements\n\n---\n\n# 13. REQUIRED OUTPUT\n\nReturn ONLY valid JSON.\n\nUse exactly this structure:\n\n{\n\"job_title\": \"string\",\n\"seniority\": null,\n\"industry\": [],\n\"must_have_skills\": [],\n\"nice_to_have_skills\": [],\n\"years_of_experience\": null,\n\"education\": [],\n\"certifications\": [],\n\"soft_skills\": [],\n\"location_or_timezone\": []\n}\n\n---\n\n# 14. FINAL VALIDATION\n\nBefore returning the JSON, silently verify:\n\n1. Every required criterion from the Job Description is represented.\n2. Every nice-to-have criterion from the Job Description is represented.\n3. Soft skills are extracted separately even when they also belong to must-have or nice-to-have.\n4. No soft skill is removed from must-have merely because it is classified as a soft skill.\n5. No criterion is invented.\n6. Numbers and thresholds are preserved exactly.\n7. Location/timezone requirements are preserved.\n8. Education and certifications are not invented.\n9. Output is valid JSON only.\n10. The Job Description is the only source of truth.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        16,
+        0
+      ],
+      "id": "4ed81150-3cb9-492e-9f8c-13e5c85fe083",
+      "name": "Job Description Analyzer"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text;\n\nlet data;\n\ntry {\n  data = JSON.parse(raw);\n} catch (error) {\n  throw new Error('AI returned invalid JSON');\n}\n\nconst input = $('Build Input Data').first().json;\n\nreturn [\n  {\n    json: {\n      ...data,\n      resumes: input.resumes,\n      chat_id: input.chat_id ?? null\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        0
+      ],
+      "id": "fe4c3550-741f-4132-b9bf-4932a305c674",
+      "name": "Parse JD JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconst resumes = input.resumes;\nconst jobCriteria = input;\n\nif (!Array.isArray(resumes) || resumes.length === 0) {\n  throw new Error('No resumes found.');\n}\n\nreturn resumes.map(resume => ({\n  json: {\n    candidate_name: resume.candidate_name,\n    resume_text: resume.resume_text,\n\n    job_criteria: {\n      job_title: jobCriteria.job_title,\n      seniority: jobCriteria.seniority,\n      industry: jobCriteria.industry,\n\n      required_experience_years: jobCriteria.years_of_experience,\n\n      must_have_skills: jobCriteria.must_have_skills,\n      nice_to_have_skills: jobCriteria.nice_to_have_skills,\n\n      education: jobCriteria.education,\n      certifications: jobCriteria.certifications,\n      soft_skills: jobCriteria.soft_skills,\n\n      location_or_timezone: jobCriteria.location_or_timezone\n    }\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        0
+      ],
+      "id": "c91c9680-9ec9-4d21-983d-f1548c2b6c4d",
+      "name": "Prepare Candidates"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "51252945-6359-4b2d-92fd-18add411a10a",
+      "name": "Loop Through Resumes"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=JOB CRITERIA:\n\n{{ JSON.stringify($json.job_criteria) }}\n\nCANDIDATE NAME:\n\n{{ $json.candidate_name }}\n\nRESUME:\n\n{{ $json.resume_text }}\n\nExtract explicit evidence from this resume for every criterion in the Job Criteria.\n\nDo not make a final hiring decision.\n\nDo not calculate a score.\n\nReturn the required JSON structure only.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an evidence extraction engine for a resume screening system.\n\nYour task is to examine ONE candidate resume against the provided Job Criteria and extract explicit evidence from the resume.\n\nThe Job Criteria are the only source of requirements.\nThe Resume is the only source of candidate evidence.\n\nDo NOT make final hiring decisions.\nDo NOT calculate a score.\nDo NOT classify candidates as good or bad.\n\nYour job is ONLY to find evidence.\n\n---\n# CORE RULE\n\nFor every criterion in the Job Criteria, look through the resume and determine whether there is explicit evidence relevant to that criterion.\n\nFor each criterion return:\n\n* the exact original criterion\n* status: \"supported\", \"unsupported\", or \"partial\"\n* evidence: the exact relevant information from the resume\n* confidence: \"high\", \"medium\", or \"low\"\n\nIf there is no relevant evidence:\n\nstatus = \"unsupported\"\nevidence = \"\"\n\nIf the resume contains evidence but it does not fully satisfy the criterion:\n\nstatus = \"partial\"\n\nIf the resume explicitly satisfies the criterion:\n\nstatus = \"supported\"\n\nDo not upgrade partial evidence to supported.\n\nDo not invent evidence.\n\n---\n\n## CANDIDATE NAME EXTRACTION\n\nExtract the candidate's actual personal name from the resume.\n\nThe candidate name is a person's name, NOT:\n\n* a job title\n* a section heading\n* a location\n* a company name\n* a school/university name\n* contact information\n\nResume text may have formatting problems where the name is split across multiple lines.\n\nFor example:\n\nELSHADAY\nABRAHAM\nSALES DEVELOPMENT\nREPRESENTATIVE\n\nThe correct candidate_name is:\n\n\"ELSHADAY ABRAHAM\"\n\nDo NOT return values such as:\n\n\"EDUCATION\"\n\"CONTACT\"\n\"WORK EXPERIENCE\"\n\"SALES DEVELOPMENT\"\n\"SALES DEVELOPMENT REPRESENTATIVE\"\n\"Maadi, Cairo - Egypt\"\n\nIf the name is split across consecutive lines, combine the lines into the full personal name.\n\nUse only information explicitly present in the resume.\n\nIf the candidate's personal name cannot be reliably identified, return:\n\n\"candidate_name\": \"Unknown\"\n---\n\n# EVIDENCE RULES\n\n## 1. Exact evidence\n\nEvidence must come directly from the resume.\n\nPrefer short exact excerpts or faithful extracts from the resume.\n\nDo not invent wording that does not appear in the resume.\n\n---\n\n## 2. Numeric requirements\n\nPreserve numeric values exactly.\n\nFor example:\n\nRequirement:\n\"130–150+ calls per day\"\n\nResume:\n\"150 outbound calls daily\"\n\n→ supported\n\nResume:\n\"100 calls per day\"\n\n→ partial\n\nResume:\n\"high-volume calling\"\n\n→ partial or unsupported depending on context.\n\nNever infer a numeric threshold.\n\n---\n\n# 3. EXPERIENCE\n\nExperience must be evaluated from the actual employment history in the resume.\n\nDo NOT use only the candidate's job title as the evidence for years of experience.\n\nLook for:\n\n* employment dates\n* start and end years\n* start and end months\n* duration statements\n* explicit years of experience\n\nExamples:\n\n\"Jan 2023 – Mar 2025\"\n→ approximately 2 years\n\n\"2022 – 2025\"\n→ approximately 3 years\n\n\"3+ years of experience in sales\"\n→ candidate_years = 3\n\n\"Sales Development Representative\"\nwith no dates and no duration\n→ candidate_years = null\n\nIf multiple relevant roles exist, calculate the total relevant experience conservatively.\n\nDo not double-count overlapping employment periods.\n\nFor:\n\n\"1+ year of SDR or high-volume outbound sales experience\"\n\nexperience in either:\n\n* SDR / Sales Development Representative work\n  OR\n* clearly described high-volume outbound sales work\n\ncan satisfy the experience requirement.\n\nIf the resume clearly establishes at least the required amount of relevant experience, set:\n\nstatus = \"supported\"\n\nand provide the calculated candidate_years.\n\nIf the resume proves relevant experience but the duration cannot be established, set:\n\nstatus = \"partial\"\n\nand candidate_years = null.\n\nNever invent dates or durations.\n\n---\n\n# 4. CRM AND SALES TECHNOLOGY\n\nFor:\n\n\"Experience using Salesforce or similar CRM platforms\"\n\nAccept explicitly named CRM platforms.\n\nExamples include:\n\nSalesforce\nHubSpot\nZoho CRM\nPipedrive\nMicrosoft Dynamics\nAmoCRM\n\nAlso accept other clearly identified CRM platforms when the resume explicitly describes them as CRM software or as being used to manage leads, customers, or sales pipelines.\n\nDo NOT require the exact word \"CRM\" if the platform is clearly identified and its sales-management purpose is explicitly described.\n\nExample:\n\n\"Utilized AmoCRM to manage leads and sales pipeline\"\n\n→ supported\n\nGeneric:\n\n\"Used CRM software\"\n\n→ partial\n\nDo not treat unrelated software as CRM evidence.\n\n---\n\n# 5. CALLING PLATFORMS\n\nFor:\n\n\"Experience with Dialpad or cloud-based calling platforms\"\n\nAccept explicitly named calling or cloud-based phone platforms.\n\nExamples include:\n\nDialpad\nAircall\nCallGear\nRingCentral\nCloudTalk\nTwilio\nFive9\n\nIf the resume explicitly states that the platform was used for calls, outbound calling, sales calls, or similar calling activity:\n\n→ supported\n\nDo not require the platform to be Dialpad specifically.\n\nDo not classify a platform as a calling platform solely from its name if its purpose is unclear.\n\n---\n\n# 6. PROSPECTING / LEAD GENERATION\n\nFor:\n\n\"Experience with lead enrichment, prospecting, or AI-powered sales tools\"\n\nAccept explicit evidence of:\n\n* prospecting\n* lead generation\n* lead enrichment\n* sourcing leads\n* finding prospects\n* building prospect lists\n* outbound lead generation\n\nFor AI-powered sales tools, require an explicitly named AI sales tool or explicit AI-related sales-tool usage.\n\nGeneric sales experience alone is not enough.\n\n---\n\n# 7. REMOTE STRUCTURED SDR TEAMS\n\nFor:\n\n\"Experience working in remote structured SDR teams\"\n\nRequire evidence of BOTH:\n\n1. remote work or remote team environment\n2. structured SDR/team process\n\nExamples:\n\n\"Managed a remote team of SDRs using daily standups and KPI tracking\"\n\n→ supported\n\n\"Led and managed a team of 4–6 SDRs\"\n\n→ partial\n\nbecause team leadership alone does not prove the team was remote.\n\nDo not infer remote work from working for an international company.\n\nDo not infer remote work from working with international customers.\n\n---\n\n# 8. COACHING / ROLE-PLAYING / PERFORMANCE ENVIRONMENT\n\nFor:\n\n\"Experience with coaching, role-playing, or performance-based sales environments\"\n\nAccept explicit evidence of:\n\n* coaching\n* mentoring\n* role-playing\n* sales training\n* performance tracking\n* KPI-driven sales environments\n* quota/performance management\n\nExamples:\n\n\"Conducted weekly training sessions and daily 1:1 coaching\"\n\n→ supported\n\n\"Managed SDR KPIs and performance\"\n\n→ supported\n\n---\n\n# 9. SOFT SKILLS\n\nDo not mark a soft skill as supported merely because the resume contains one generic adjective.\n\nFor:\n\n\"Strong resilience, consistency, and self-motivation\"\n\nPrefer concrete behavioral evidence such as:\n\n* consistently exceeding targets\n* sustained high performance\n* handling high-volume activity\n* persistence in difficult sales environments\n* repeatedly meeting quotas\n* maintaining performance over time\n\nGeneric phrases such as:\n\n\"results-driven\"\n\"motivated\"\n\"hardworking\"\n\"ambitious\"\n\"proactive\"\n\nalone should normally be:\n\nstatus = \"partial\"\n\nunless the surrounding resume provides concrete behavioral evidence.\n\nNever invent behavioral evidence.\n\n---\n\n# 10. HIGH-VOLUME OUTBOUND CALLING\n\nFor:\n\n\"Proven ability to make 130–150+ calls per day while maintaining quality conversations\"\n\nThis is a strict numeric requirement.\n\nThe evidence MUST explicitly mention a call-volume number connected to a time period such as:\n\n* calls per day\n* outbound calls daily\n* calls/day\n* calls each day\n\nExamples:\n\n\"150 outbound calls daily\"\n→ supported\n\n\"130 calls per day\"\n→ supported\n\n\"150+ calls/day\"\n→ supported\n\n\"100 calls per day\"\n→ partial\n\n\"High-volume outbound calling\"\n→ partial\n\n\"High-volume outreach\"\n→ partial or unsupported\n\n\"Booked 5–10 qualified meetings per day\"\n→ unsupported\n\n\"Generated 5–10 meetings daily\"\n→ unsupported\n\n\"Contacted many prospects\"\n→ partial or unsupported\n\nIMPORTANT:\n\nDo NOT use meetings booked, leads generated, prospects contacted, conversion rates, or any other sales metric as evidence of call volume.\n\nDo NOT infer the number of calls from:\n\n* SDR title\n* Sales Development Representative title\n* outbound sales experience\n* high-volume outreach\n* number of meetings booked\n* number of leads generated\n* team performance\n* individual or team targets\n\nIf there is no explicit calls-per-day evidence:\n\nstatus = \"unsupported\"\n\nevidence = \"\"\n\nThe only exception is when the resume explicitly gives a different numeric call frequency that can be directly compared with the requirement.\n\nNever invent or estimate call volume.\n\n\n---\n\n# REQUIRED OUTPUT\n\nReturn ONLY valid JSON.\n\nUse exactly this structure:\n\n{\n\"candidate_name\": \"string\",\n\n\"experience\": {\n\"required_years\": null,\n\"candidate_years\": null,\n\"evidence\": \"\",\n\"status\": \"supported\"\n},\n\n\"seniority\": {\n\"required\": null,\n\"candidate\": null,\n\"evidence\": \"\",\n\"status\": \"unsupported\"\n},\n\n\"industry\": [\n{\n\"criterion\": \"string\",\n\"status\": \"supported\",\n\"evidence\": \"\",\n\"confidence\": \"high\"\n}\n],\n\n\"must_have\": [\n{\n\"criterion\": \"string\",\n\"status\": \"supported\",\n\"evidence\": \"\",\n\"confidence\": \"high\"\n}\n],\n\n\"nice_to_have\": [\n{\n\"criterion\": \"string\",\n\"status\": \"supported\",\n\"evidence\": \"\",\n\"confidence\": \"high\"\n}\n],\n\n\"soft_skills\": [\n{\n\"criterion\": \"string\",\n\"status\": \"supported\",\n\"evidence\": \"\",\n\"confidence\": \"high\"\n}\n],\n\n\"location_or_timezone\": [\n{\n\"criterion\": \"string\",\n\"status\": \"supported\",\n\"evidence\": \"\",\n\"confidence\": \"high\"\n}\n]\n}\n\n---\n\n# FINAL VALIDATION\n\nBefore returning JSON, verify:\n\n1. Every must-have criterion appears exactly once.\n2. Every nice-to-have criterion appears exactly once.\n3. Every soft-skill criterion appears exactly once.\n4. Every industry criterion appears exactly once.\n5. Every location/timezone criterion appears exactly once.\n6. Evidence comes only from the resume.\n7. No numeric threshold is invented.\n8. No missing evidence is guessed.\n9. Compound requirements are not treated as fully supported when only part is present.\n10. OR requirements can be supported by one valid alternative.\n11. Output is valid JSON only.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1056,
+        16
+      ],
+      "id": "dc773e27-ca7d-42a4-ba67-9def3ba75d32",
+      "name": "RESUME ANALYZER"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text;\n\nlet data;\n\ntry {\n  data = JSON.parse(raw);\n} catch (error) {\n  throw new Error('AI returned invalid JSON.');\n}\n\nfunction isObject(value) {\n  return value !== null && typeof value === 'object' && !Array.isArray(value);\n}\n\nfunction assert(condition, message) {\n  if (!condition) {\n    throw new Error(`Resume evaluation validation failed: ${message}`);\n  }\n}\n\nassert(isObject(data), 'Output must be a JSON object.');\n\nconst source = $('Loop Through Resumes').item.json;\nconst jobCriteria = source.job_criteria;\n\nassert(\n  isObject(jobCriteria),\n  'Original job criteria could not be found.'\n);\n\nassert(\n  typeof data.candidate_name === 'string',\n  'candidate_name must be a string.'\n);\n\n// Prefer the AI-extracted candidate name, with workflow source as fallback.\ndata.candidate_name = data.candidate_name?.trim() || source.candidate_name;\n\n// ==================================================\n// ORIGINAL JD CRITERIA\n// ==================================================\n\nconst mustHave = Array.isArray(jobCriteria.must_have_skills)\n  ? jobCriteria.must_have_skills\n  : [];\n\nconst niceToHave = Array.isArray(jobCriteria.nice_to_have_skills)\n  ? jobCriteria.nice_to_have_skills\n  : [];\n\nconst softSkills = Array.isArray(jobCriteria.soft_skills)\n  ? jobCriteria.soft_skills\n  : [];\n\nconst industryCriteria = Array.isArray(jobCriteria.industry)\n  ? jobCriteria.industry\n  : [];\n\nconst locationCriteria = Array.isArray(jobCriteria.location_or_timezone)\n  ? jobCriteria.location_or_timezone\n  : [];\n\n// ==================================================\n// HELPERS\n// ==================================================\n\nfunction getEvidence(array, criterion) {\n  if (!Array.isArray(array)) return null;\n\n  return (\n    array.find(\n      item =>\n        item &&\n        typeof item.criterion === 'string' &&\n        item.criterion.trim() === criterion.trim()\n    ) || null\n  );\n}\n\nfunction normalizeStatus(evidence) {\n  return evidence?.status ?? 'unsupported';\n}\n\n// ==================================================\n// SPECIAL NORMALIZATION\n// ==================================================\n\nfunction normalizeMustHaveCriterion(criterion, evidence) {\n\n  // EXPERIENCE\n  if (\n    criterion ===\n    '1+ year of SDR or high-volume outbound sales experience'\n  ) {\n    if (\n      data.experience &&\n      typeof data.experience.candidate_years === 'number' &&\n      data.experience.candidate_years >= 1\n    ) {\n      return 'supported';\n    }\n\n    return normalizeStatus(evidence);\n  }\n\n  // CALL VOLUME\n  if (\n    criterion ===\n    'Proven ability to make 130–150+ calls per day while maintaining quality conversations'\n  ) {\n    const text = evidence?.evidence || '';\n\n    const hasCallNumber =\n      /\\b\\d+\\+?\\s*(?:outbound\\s+)?calls?\\s*(?:per\\s*day|\\/\\s*day|daily|each\\s+day)\\b/i.test(\n        text\n      );\n\n    if (hasCallNumber) {\n      return normalizeStatus(evidence);\n    }\n\n    return 'unsupported';\n  }\n\n  // CRM\n  if (\n    criterion ===\n    'Experience using Salesforce or similar CRM platforms'\n  ) {\n    const text = evidence?.evidence || '';\n\n    const namedCRM =\n      /\\b(?:Salesforce|HubSpot|Zoho(?:\\s+CRM)?|Pipedrive|Microsoft\\s+Dynamics|AmoCRM)\\b/i.test(\n        text\n      );\n\n    if (namedCRM) {\n      return 'supported';\n    }\n\n    return normalizeStatus(evidence);\n  }\n\n  return normalizeStatus(evidence);\n}\n\n// ==================================================\n// CRITERIA CLASSIFIER\n// ==================================================\n\nfunction classifyCriteria(\n  evidenceArray,\n  originalCriteria,\n  customNormalizer = null\n) {\n  assert(\n    Array.isArray(evidenceArray),\n    'Evidence criteria group must be an array.'\n  );\n\n  const supported = [];\n  const partial = [];\n  const notMentioned = [];\n\n  for (const criterion of originalCriteria) {\n    const evidence = getEvidence(\n      evidenceArray,\n      criterion\n    );\n\n    const status = customNormalizer\n      ? customNormalizer(criterion, evidence)\n      : normalizeStatus(evidence);\n\n    if (status === 'supported') {\n      supported.push(criterion);\n    } else if (status === 'partial') {\n      partial.push(criterion);\n    } else {\n      notMentioned.push(criterion);\n    }\n  }\n\n  return {\n    supported,\n    partial,\n    not_mentioned: notMentioned\n  };\n}\n\n// ==================================================\n// INDUSTRY\n// ==================================================\n\nconst industryResult = classifyCriteria(\n  data.industry,\n  industryCriteria\n);\n\n// ==================================================\n// MUST-HAVE\n// ==================================================\n\nconst mustHaveResult = classifyCriteria(\n  data.must_have,\n  mustHave,\n  normalizeMustHaveCriterion\n);\n\n// ==================================================\n// NICE-TO-HAVE\n// ==================================================\n\nfunction normalizeNiceToHaveCriterion(criterion, evidence) {\n  const text = evidence?.evidence || '';\n\n  if (\n    criterion ===\n    'Experience with Dialpad or cloud-based calling platforms'\n  ) {\n    const callingPlatform =\n      /\\b(?:Dialpad|Aircall|CallGear|RingCentral|CloudTalk|Twilio|Five9)\\b/i.test(\n        text\n      );\n\n    if (callingPlatform) {\n      return 'supported';\n    }\n\n    return normalizeStatus(evidence);\n  }\n\n  return normalizeStatus(evidence);\n}\n\nconst niceToHaveResult = classifyCriteria(\n  data.nice_to_have,\n  niceToHave,\n  normalizeNiceToHaveCriterion\n);\n\n// ==================================================\n// SOFT SKILLS\n// ==================================================\n\nconst softSkillsResult = classifyCriteria(\n  data.soft_skills,\n  softSkills\n);\n\n// ==================================================\n// LOCATION / TIMEZONE\n// ==================================================\n\nconst locationResult = classifyCriteria(\n  data.location_or_timezone,\n  locationCriteria\n);\n\n// ==================================================\n// NORMALIZED OUTPUT\n// ==================================================\n\ndata.industry = {\n  required: industryCriteria,\n  supported: industryResult.supported,\n  partial: industryResult.partial,\n  not_mentioned: industryResult.not_mentioned\n};\n\ndata.must_have = {\n  supported: mustHaveResult.supported,\n  partial: mustHaveResult.partial,\n  not_mentioned: mustHaveResult.not_mentioned\n};\n\ndata.nice_to_have = {\n  supported: niceToHaveResult.supported,\n  partial: niceToHaveResult.partial,\n  not_mentioned: niceToHaveResult.not_mentioned\n};\n\ndata.soft_skills = {\n  supported: softSkillsResult.supported,\n  partial: softSkillsResult.partial,\n  not_mentioned: softSkillsResult.not_mentioned\n};\n\ndata.location_or_timezone = {\n  required: locationCriteria,\n  supported: locationResult.supported,\n  partial: locationResult.partial,\n  not_mentioned: locationResult.not_mentioned\n};\n\n// ==================================================\n// EXPERIENCE\n// ==================================================\n\nassert(\n  isObject(data.experience),\n  'experience must be an object.'\n);\n\nconst requiredYears =\n  jobCriteria.required_experience_years ?? null;\n\nconst candidateYears =\n  typeof data.experience.candidate_years === 'number'\n    ? data.experience.candidate_years\n    : null;\n\ndata.experience = {\n  required_years: requiredYears,\n  candidate_years: candidateYears,\n  evidence: data.experience.evidence ?? '',\n  meets_requirement:\n    requiredYears === null || candidateYears === null\n      ? null\n      : candidateYears >= requiredYears\n};\n\n// ==================================================\n// SENIORITY\n// ==================================================\n\nassert(\n  isObject(data.seniority),\n  'seniority must be an object.'\n);\n\nconst requiredSeniority =\n  jobCriteria.seniority ?? null;\n\nconst candidateSeniority =\n  data.seniority.candidate ?? null;\n\ndata.seniority = {\n  required: requiredSeniority,\n  candidate: candidateSeniority,\n  meets_requirement:\n    requiredSeniority === null\n      ? null\n      : data.seniority.status === 'supported'\n};\n\n// ==================================================\n// SCREENING QUESTION\n// ==================================================\n\nfunction buildScreeningQuestion() {\n\n  if (mustHaveResult.not_mentioned.length > 0) {\n    const criterion =\n      mustHaveResult.not_mentioned[0];\n\n    return `Can you walk us through your experience with \"${criterion}\" and provide a specific example?`;\n  }\n\n  if (mustHaveResult.partial.length > 0) {\n    const criterion =\n      mustHaveResult.partial[0];\n\n    return `Can you provide more specific evidence of your experience with \"${criterion}\"?`;\n  }\n\n  if (locationResult.not_mentioned.length > 0) {\n    const criterion =\n      locationResult.not_mentioned[0];\n\n    return `Are you comfortable meeting the required working schedule: \"${criterion}\"?`;\n  }\n\n  if (niceToHaveResult.not_mentioned.length > 0) {\n    const criterion =\n      niceToHaveResult.not_mentioned[0];\n\n    return `Can you tell us whether you have experience with \"${criterion}\"?`;\n  }\n\n  return 'Can you walk us through the experience in your resume that is most relevant to this role?';\n}\n\ndata.screening_question =\n  buildScreeningQuestion();\n\n// ==================================================\n// REASONING\n// ==================================================\n\nfunction buildReasoning() {\n\n  const supported =\n    mustHaveResult.supported.length;\n\n  const partial =\n    mustHaveResult.partial.length;\n\n  const missing =\n    mustHaveResult.not_mentioned.length;\n\n  let experienceText;\n\n  if (data.experience.meets_requirement === true) {\n    experienceText =\n      `${data.experience.candidate_years}+ years of relevant experience`;\n  } else if (\n    data.experience.meets_requirement === false\n  ) {\n    experienceText =\n      `${data.experience.candidate_years ?? 0} years of relevant experience`;\n  } else {\n    experienceText =\n      'the required experience level could not be fully verified';\n  }\n\n  let sentence1 =\n    `The resume provides explicit evidence for ${supported} of ${mustHave.length} required criteria, with ${partial} additional criteria partially supported, and indicates ${experienceText}.`;\n\n  let sentence2;\n\n  if (missing > 0) {\n    sentence2 =\n      `The main gap is ${mustHaveResult.not_mentioned.slice(0, 2).join(' and ')}.`;\n  } else {\n    sentence2 =\n      'No major required-criterion gaps were identified from the available resume evidence.';\n  }\n\n  return `${sentence1} ${sentence2}`;\n}\n\ndata.reasoning =\n  buildReasoning();\n\n// ==================================================\n// VALIDATION\n// ==================================================\n\nfunction validateCriteria(\n  original,\n  supported,\n  partial,\n  notMentioned,\n  label\n) {\n  const all = [\n    ...supported,\n    ...partial,\n    ...notMentioned\n  ];\n\n  for (const criterion of original) {\n    const count =\n      all.filter(item => item === criterion).length;\n\n    assert(\n      count === 1,\n      `${label} criterion must appear exactly once: \"${criterion}\"`\n    );\n  }\n\n  for (const criterion of all) {\n    assert(\n      original.includes(criterion),\n      `Invented or altered ${label} criterion: \"${criterion}\"`\n    );\n  }\n\n  assert(\n    new Set(all).size === all.length,\n    `Duplicate ${label} criteria detected.`\n  );\n}\n\nvalidateCriteria(\n  industryCriteria,\n  data.industry.supported,\n  data.industry.partial,\n  data.industry.not_mentioned,\n  'industry'\n);\n\nvalidateCriteria(\n  mustHave,\n  data.must_have.supported,\n  data.must_have.partial,\n  data.must_have.not_mentioned,\n  'must-have'\n);\n\nvalidateCriteria(\n  niceToHave,\n  data.nice_to_have.supported,\n  data.nice_to_have.partial,\n  data.nice_to_have.not_mentioned,\n  'nice-to-have'\n);\n\nvalidateCriteria(\n  softSkills,\n  data.soft_skills.supported,\n  data.soft_skills.partial,\n  data.soft_skills.not_mentioned,\n  'soft-skills'\n);\n\nvalidateCriteria(\n  locationCriteria,\n  data.location_or_timezone.supported,\n  data.location_or_timezone.partial,\n  data.location_or_timezone.not_mentioned,\n  'location/timezone'\n);\n\nassert(\n  typeof data.reasoning === 'string' &&\n  data.reasoning.trim().length > 0,\n  'reasoning must be a non-empty string.'\n);\n\nassert(\n  typeof data.screening_question === 'string' &&\n  data.screening_question.trim().length > 0,\n  'screening_question must be a non-empty string.'\n);\n\nreturn [\n  {\n    json: data\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        16
+      ],
+      "id": "e31ad801-2581-48d1-ade8-9c47ee25a373",
+      "name": "Parse Resume Evaluation"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const candidate = $json;\n\n// These weights are our scoring design choices.\n// They are NOT specified by the exercise file.\nconst WEIGHTS = {\n  must_have: 50,\n  experience: 20,\n  seniority: 10,\n  industry: 5,\n  location_or_timezone: 5,\n  nice_to_have: 5,\n  soft_skills: 5\n};\n\n// --------------------------------------------------\n// HELPERS\n// --------------------------------------------------\n\nfunction round(value) {\n  return Math.round(value * 100) / 100;\n}\n\nfunction weightedCriteriaScore(group, weight, excludedCriteria = []) {\n  if (!group) return null;\n\n  const excluded = new Set(excludedCriteria);\n\n  const supported = Array.isArray(group.supported)\n    ? group.supported.filter(item => !excluded.has(item)).length\n    : 0;\n\n  const partial = Array.isArray(group.partial)\n    ? group.partial.filter(item => !excluded.has(item)).length\n    : 0;\n\n  const notMentioned = Array.isArray(group.not_mentioned)\n    ? group.not_mentioned.filter(item => !excluded.has(item)).length\n    : 0;\n\n  const total =\n    supported +\n    partial +\n    notMentioned;\n\n  if (total === 0) return null;\n\n  // Supported = 100%\n  // Partial = 50%\n  // Not mentioned = 0%\n  const earnedEquivalent =\n    supported +\n    (partial * 0.5);\n\n  return round(\n    (earnedEquivalent / total) * weight\n  );\n}\n\nlet earnedScore = 0;\nlet applicableWeight = 0;\n\nconst scoreBreakdown = {};\n\n// ------------------------------------\n// 1. MUST-HAVE SKILLS\n// ------------------------------------\n\n// Experience is scored separately below,\n// so exclude the experience criterion here.\nconst EXPERIENCE_CRITERION =\n  '1+ year of SDR or high-volume outbound sales experience';\n\nconst mustHaveScore =\n  weightedCriteriaScore(\n    candidate.must_have,\n    WEIGHTS.must_have,\n    [EXPERIENCE_CRITERION]\n  );\n\nif (mustHaveScore !== null) {\n  scoreBreakdown.must_have = mustHaveScore;\n\n  earnedScore += mustHaveScore;\n  applicableWeight += WEIGHTS.must_have;\n}\n\n// ------------------------------------\n// 2. EXPERIENCE\n// ------------------------------------\n\nif (\n  candidate.experience &&\n  candidate.experience.meets_requirement !== null\n) {\n\n  const score =\n    candidate.experience.meets_requirement === true\n      ? WEIGHTS.experience\n      : 0;\n\n  scoreBreakdown.experience = score;\n\n  earnedScore += score;\n  applicableWeight += WEIGHTS.experience;\n}\n\n// ------------------------------------\n// 3. SENIORITY\n// ------------------------------------\n\nif (\n  candidate.seniority &&\n  candidate.seniority.required !== null\n) {\n\n  const score =\n    candidate.seniority.meets_requirement === true\n      ? WEIGHTS.seniority\n      : 0;\n\n  scoreBreakdown.seniority = score;\n\n  earnedScore += score;\n  applicableWeight += WEIGHTS.seniority;\n}\n\n// ------------------------------------\n// 4. INDUSTRY\n// ------------------------------------\n\nconst industryRequired =\n  Array.isArray(candidate.industry?.required)\n    ? candidate.industry.required.length\n    : 0;\n\nif (industryRequired > 0) {\n\n  const industryScore =\n    weightedCriteriaScore(\n      candidate.industry,\n      WEIGHTS.industry\n    );\n\n  if (industryScore !== null) {\n    scoreBreakdown.industry = industryScore;\n\n    earnedScore += industryScore;\n    applicableWeight += WEIGHTS.industry;\n  }\n}\n\n// ------------------------------------\n// 5. LOCATION / TIMEZONE\n// ------------------------------------\n\nconst locationRequired =\n  Array.isArray(\n    candidate.location_or_timezone?.required\n  )\n    ? candidate.location_or_timezone.required.length\n    : 0;\n\nif (locationRequired > 0) {\n\n  const locationScore =\n    weightedCriteriaScore(\n      candidate.location_or_timezone,\n      WEIGHTS.location_or_timezone\n    );\n\n  if (locationScore !== null) {\n    scoreBreakdown.location_or_timezone =\n      locationScore;\n\n    earnedScore += locationScore;\n    applicableWeight += WEIGHTS.location_or_timezone;\n  }\n}\n\n// ------------------------------------\n// 6. NICE-TO-HAVE SKILLS\n// ------------------------------------\n\nconst niceToHaveScore =\n  weightedCriteriaScore(\n    candidate.nice_to_have,\n    WEIGHTS.nice_to_have\n  );\n\nif (niceToHaveScore !== null) {\n  scoreBreakdown.nice_to_have =\n    niceToHaveScore;\n\n  earnedScore += niceToHaveScore;\n  applicableWeight += WEIGHTS.nice_to_have;\n}\n\n// ------------------------------------\n// 7. SOFT SKILLS\n// ------------------------------------\n\nconst softSkillsScore =\n  weightedCriteriaScore(\n    candidate.soft_skills,\n    WEIGHTS.soft_skills\n  );\n\nif (softSkillsScore !== null) {\n  scoreBreakdown.soft_skills =\n    softSkillsScore;\n\n  earnedScore += softSkillsScore;\n  applicableWeight += WEIGHTS.soft_skills;\n}\n\n// ------------------------------------\n// FINAL NORMALIZED SCORE\n// ------------------------------------\n\nconst fitScore =\n  applicableWeight === 0\n    ? 0\n    : round(\n        (earnedScore / applicableWeight) * 100\n      );\n\nreturn {\n  json: {\n    ...candidate,\n\n    score_breakdown: scoreBreakdown,\n\n    raw_score: round(earnedScore),\n\n    applicable_weight: applicableWeight,\n\n    fit_score: fitScore\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        16
+      ],
+      "id": "2e1c358a-049b-43ea-b150-056c890484fd",
+      "name": "Calculate Score"
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = $input.all();\n\nif (!candidates.length) {\n  throw new Error('No candidates received.');\n}\n\n// Remove accidental duplicate candidates\nconst uniqueCandidates = [];\nconst seen = new Set();\n\nfor (const item of candidates) {\n  const candidate = item.json;\n\n  const key = `${candidate.candidate_name}|${candidate.fit_score}`;\n\n  if (!seen.has(key)) {\n    seen.add(key);\n    uniqueCandidates.push(item);\n  }\n}\n\n// Sort by fit score\nuniqueCandidates.sort((a, b) => {\n  return Number(b.json.fit_score) - Number(a.json.fit_score);\n});\n\n// Assign rank\nreturn uniqueCandidates.map((item, index) => ({\n  json: {\n    ...item.json,\n    rank: index + 1\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        -160
+      ],
+      "id": "b0965f27-39d3-47df-aa2c-d148ade19faa",
+      "name": "Rank Candidates"
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = $input.all();\n\nif (!candidates.length) {\n  throw new Error('Node 11 received no candidates from Node 10.');\n}\n\nconst sortedCandidates = [...candidates].sort(\n  (a, b) => Number(a.json.rank ?? 999) - Number(b.json.rank ?? 999)\n);\n\nreturn [\n  {\n    json: {\n      job_title:\n        $('Parse JD JSON').first().json.job_title ?? null,\n\n      total_candidates: sortedCandidates.length,\n\n      ranked_candidates: sortedCandidates.map(item => ({\n        rank: item.json.rank,\n        candidate_name: item.json.candidate_name,\n        fit_score: item.json.fit_score,\n        reasoning: item.json.reasoning,\n        screening_question: item.json.screening_question\n      })),\n\n      side_by_side: sortedCandidates.map(item => ({\n        rank: item.json.rank,\n        candidate_name: item.json.candidate_name,\n        fit_score: item.json.fit_score,\n\n        reasoning: item.json.reasoning,\n        screening_question: item.json.screening_question,\n\n        experience: item.json.experience,\n        seniority: item.json.seniority,\n        industry: item.json.industry,\n        must_have: item.json.must_have,\n        nice_to_have: item.json.nice_to_have,\n        soft_skills: item.json.soft_skills,\n        location_or_timezone: item.json.location_or_timezone,\n        education: item.json.education,\n        certifications: item.json.certifications\n      }))\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -160
+      ],
+      "id": "fc5b7c50-1d2e-47fc-985c-1944b3f8a445",
+      "name": "Build Recruiter Report"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=JOB TITLE:\n{{ $json.job_title }}\n\nTOTAL CANDIDATES:\n{{ $json.total_candidates }}\n\nCANDIDATE DATA:\n{{ JSON.stringify($json.side_by_side) }}\n\nIMPORTANT:\n\nThe `CANDIDATE DATA` above is the single source of truth.\n\nOutput the candidates in the exact `rank` order provided by the data.\n\nDo not recalculate, modify, round, or reinterpret any `fit_score`.\n\nUse each candidate's `candidate_name`, `rank`, `fit_score`, `experience`, `screening_question`, and evidence fields exactly as provided.\n\nFor evidence classification:\n\n* `supported` = Key Strengths\n* `partial` = Partial Matches\n* `not_mentioned` = Key Gaps\n\nDo not use any information outside `CANDIDATE DATA`.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a professional recruitment report formatter.\n\nYour ONLY task is to transform the structured candidate data in the input into a concise, professional Telegram recruitment report.\n\nYou MUST NOT perform recruitment evaluation.\nYou MUST NOT recalculate scores.\nYou MUST NOT change ranks.\nYou MUST NOT reinterpret evidence.\nYou MUST NOT invent information.\n\nYou are a FORMATTER, not an evaluator.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# SOURCE OF TRUTH\n\nThe input contains a `side_by_side` array containing the complete structured evaluation for every candidate.\n\nFor candidate-level information, `side_by_side` is the ONLY source of truth.\n\nUse the fields exactly as follows:\n\n* `candidate_name` → candidate name\n\n* `rank` → candidate rank\n\n* `fit_score` → fit score\n\n* `experience` → Experience section\n\n* `screening_question` → Screening Question\n\n* `must_have.supported` → Key Strengths\n\n* `nice_to_have.supported` → Key Strengths\n\n* `soft_skills.supported` → Key Strengths\n\n* `industry.supported` → Key Strengths\n\n* `location_or_timezone.supported` → Key Strengths\n\n* `must_have.partial` → Partial Matches\n\n* `nice_to_have.partial` → Partial Matches\n\n* `soft_skills.partial` → Partial Matches\n\n* `industry.partial` → Partial Matches\n\n* `location_or_timezone.partial` → Partial Matches\n\n* `must_have.not_mentioned` → Key Gaps\n\n* `nice_to_have.not_mentioned` → Key Gaps\n\n* `soft_skills.not_mentioned` → Key Gaps\n\n* `industry.not_mentioned` → Key Gaps\n\n* `location_or_timezone.not_mentioned` → Key Gaps\n\nThe `ranked_candidates` array may be used only for the TOP RECOMMENDATION explanation if needed.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# CRITICAL: DO NOT MIX CATEGORIES\n\nThis is an exact mapping task.\n\nIf a criterion is in `supported`, it is a Key Strength.\n\nIf a criterion is in `partial`, it is a Partial Match.\n\nIf a criterion is in `not_mentioned`, it is a Key Gap.\n\nNEVER move a criterion from one category to another.\n\nFor example:\n\nsupported:\n→ Key Strengths\n\npartial:\n→ Partial Matches\n\nnot_mentioned:\n→ Key Gaps\n\nA criterion MUST NOT appear in more than one of these sections.\n\nDo NOT use reasoning to determine whether a criterion is supported, partial, or missing.\n\nDo NOT infer category membership.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# CANDIDATE ORDER — CRITICAL\n\nThe candidates MUST be displayed in ascending numerical `rank` order.\n\nThe output order MUST be:\n\nrank 1\nrank 2\nrank 3\nrank 4\nrank 5\netc.\n\nNEVER reorder candidates based on:\n\n* fit score\n* name\n* experience\n* your judgment\n* reasoning\n* any other factor\n\nThe candidate with `rank: 1` MUST appear first.\n\nThe candidate with `rank: 2` MUST appear second.\n\nThe candidate with `rank: 3` MUST appear third.\n\nContinue in numerical order.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# TOP RECOMMENDATION\n\nThe TOP RECOMMENDATION is ALWAYS the candidate whose `rank` equals `1`.\n\nDo NOT choose another candidate.\n\nUse the exact:\n\n* candidate name\n* fit score\n* verdict\n\nFor the explanation, use ONLY the provided `reasoning` field of the rank 1 candidate.\n\nDo not add new claims.\n\nThen show the rank 1 candidate's gaps using ONLY its `not_mentioned` criteria.\n\nThen show its provided screening question.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# FIT SCORE\n\nUse the exact `fit_score` from the input.\n\nDo NOT:\n\n* recalculate it\n* round it\n* modify it\n* compare it yourself\n* create another score\n\nUse these exact verdict rules:\n\n70–100 → 🟢 Strong Match\n\n40–69.99 → 🟡 Potential Match\n\n0–39.99 → 🔴 Weak Match\n\n━━━━━━━━━━━━━━━━━━━━\n\n# EXPERIENCE\n\nEvery candidate MUST have:\n\n💼 Experience\n\nUse ONLY the candidate's `experience` object.\n\nUse its `evidence` field when it contains verified experience information.\n\nIf `candidate_years` is available, you may summarize it using one short sentence.\n\nIf `candidate_years` is null or the evidence is empty, write:\n\n\"Relevant experience was not verified.\"\n\nDo NOT invent or infer experience.\n\nDo NOT use job titles alone to create experience claims.\n\nDo NOT copy long resume descriptions.\n\nKeep the Experience section to ONE short sentence.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# KEY STRENGTHS\n\nBuild Key Strengths by taking ONLY the criteria found in:\n\n* `must_have.supported`\n* `nice_to_have.supported`\n* `soft_skills.supported`\n* `industry.supported`\n* `location_or_timezone.supported`\n\nCopy the supported criteria faithfully.\n\nDo NOT use:\n\n* partial criteria\n* not_mentioned criteria\n* reasoning\n* screening questions\n* assumptions\n\nIf there are no supported criteria across these fields, output exactly:\n\n✅ Key Strengths\n• No verified strengths identified.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# PARTIAL MATCHES\n\nBuild Partial Matches by taking ONLY the criteria found in:\n\n* `must_have.partial`\n* `nice_to_have.partial`\n* `soft_skills.partial`\n* `industry.partial`\n* `location_or_timezone.partial`\n\nDo NOT include supported criteria.\n\nDo NOT include not_mentioned criteria.\n\nAdd:\n\n\" — partially supported\"\n\nto each criterion if necessary.\n\nIf there are no partial criteria, OMIT the entire Partial Matches section.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# KEY GAPS\n\nBuild Key Gaps by taking ONLY the criteria found in:\n\n* `must_have.not_mentioned`\n* `nice_to_have.not_mentioned`\n* `soft_skills.not_mentioned`\n* `industry.not_mentioned`\n* `location_or_timezone.not_mentioned`\n\nDo NOT include supported criteria.\n\nDo NOT include partial criteria.\n\nYou may add:\n\n\" — not verified\"\n\nfor readability.\n\nDo NOT use negative judgments such as:\n\n* weak at\n* needs improvement\n* needs training\n* poor at\n* should improve\n\nIf there are no gaps, output:\n\n⚠️ Key Gaps\n• No major gaps identified.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# SCREENING QUESTION\n\nAlways use the candidate's provided `screening_question`.\n\nDo NOT create a new question.\n\nDo NOT replace it with another question.\n\nDo NOT change its meaning.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# CANDIDATE SECTIONS\n\nEvery candidate MUST use this exact structure:\n\n[Rank Emoji] #[rank] — [Candidate Name]\nFit Score: [exact fit_score]%\n[verdict]\n\n💼 Experience\n[one short sentence]\n\n✅ Key Strengths\n• [supported criterion]\n• [supported criterion]\n\n🟡 Partial Matches\n• [partial criterion] — partially supported\n\n⚠️ Key Gaps\n• [not_mentioned criterion] — not verified\n\n🎯 Screening Question\n[provided screening_question]\n\n━━━━━━━━━━━━━━━━━━━━\n\nThe Partial Matches section is optional ONLY when there are no partial criteria.\n\nAll other sections are mandatory.\n\nNEVER merge:\n\n* Experience with Key Strengths\n* Key Strengths with Partial Matches\n* Partial Matches with Key Gaps\n* Key Gaps with Screening Question\n\n━━━━━━━━━━━━━━━━━━━━\n\n# RANK EMOJIS\n\nUse:\n\n🥇 rank 1\n🥈 rank 2\n🥉 rank 3\n4️⃣ rank 4\n5️⃣ rank 5\n6️⃣ rank 6\n7️⃣ rank 7\n8️⃣ rank 8\n9️⃣ rank 9\n🔟 rank 10\n\n━━━━━━━━━━━━━━━━━━━━\n\n# TOP RECOMMENDATION FORMAT\n\nStart the report exactly with:\n\n📊 RESUME SCREENING REPORT\n\n🎯 Position\n[Job Title]\n\n👥 Candidates Analyzed: [Number]\n\n━━━━━━━━━━━━━━━━━━━━\n\n🏆 TOP RECOMMENDATION\n\n🥇 [Candidate Name]\nFit Score: [exact fit_score]%\n[verdict]\n\n[One short sentence based ONLY on the rank 1 candidate's provided reasoning.]\n\n⚠️ Main Gaps\n• [gap]\n• [gap]\n\n🎯 Screening Question\n[provided screening_question]\n\n━━━━━━━━━━━━━━━━━━━━\n\nThen output ALL candidates in ascending rank order.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# TELEGRAM READABILITY\n\nThe report is intended for Telegram on a phone.\n\nTherefore:\n\n* Use short paragraphs.\n* Use bullet points.\n* Use blank lines.\n* Do NOT use tables.\n* Do NOT output JSON.\n* Do NOT expose prompts.\n* Do NOT expose scoring logic.\n* Do NOT expose workflow details.\n* Do NOT add unnecessary commentary.\n* Keep the report concise.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# FINAL VALIDATION\n\nBefore outputting the report, silently verify:\n\n1. Candidate count equals `total_candidates`.\n2. Every candidate appears exactly once.\n3. Candidate order is strictly rank 1, rank 2, rank 3, etc.\n4. Rank 1 is the TOP RECOMMENDATION.\n5. Every fit score exactly matches the input.\n6. Every verdict matches the fit-score range.\n7. Every `supported` criterion appears only under Key Strengths.\n8. Every `partial` criterion appears only under Partial Matches.\n9. Every `not_mentioned` criterion appears only under Key Gaps.\n10. No criterion was moved between categories.\n11. Experience comes only from the `experience` object.\n12. Screening questions come only from the provided `screening_question`.\n13. No information was invented.\n14. No score was recalculated.\n15. No candidate was reordered.\n\nIf there is any conflict between your interpretation and the structured data, ALWAYS follow the structured data.\n\n━━━━━━━━━━━━━━━━━━━━\n\n# FINAL NOTE\n\nEnd EXACTLY with:\n\n━━━━━━━━━━━━━━━━━━━━\n\nℹ️ Assessment Note\nThis screening is based only on evidence available in the submitted resumes. Information not explicitly provided was treated as unverified.\n\nOUTPUT ONLY THE REPORT.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1472,
+        -160
+      ],
+      "id": "77fff209-c8e4-49dc-b340-49e3e6e3cddc",
+      "name": "FORMATTER"
+    },
+    {
+      "parameters": {
+        "operation": "sendRichMessage",
+        "chatId": "5191559185",
+        "richMessageText": "={{ $json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        -160
+      ],
+      "id": "acd8fea2-3309-41d3-b9e4-cb68eb09f7de",
+      "name": "Send Full Report",
+      "webhookId": "3c7f00a1-0424-4a3a-ba04-8189cf2ca61a",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y7scpMjPjTlLqbTj",
+          "name": "resume ranker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "binaryData": "={{ true }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2272,
+        -640
+      ],
+      "id": "6309b8c5-1879-4051-9457-5302fb869d8b",
+      "name": "Send Photo Report",
+      "webhookId": "cf6d1500-f940-4818-89ca-f19d075202d9",
+      "credentials": {
+        "telegramApi": {
+          "id": "Y7scpMjPjTlLqbTj",
+          "name": "resume ranker"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "PDF to PNG": [
+      {
+        "json": {
+          "pageNumber": 1,
+          "width": 1800,
+          "height": 1660,
+          "totalPages": 1,
+          "sourceFile": "resume-screening-summary.pdf"
+        },
+        "binary": {
+          "data": {
+            "mimeType": "image/png",
+            "fileType": "image",
+            "fileExtension": "png",
+            "data": "filesystem-v2",
+            "fileName": "resume-screening-summary_1.png",
+            "id": "filesystem-v2:workflows/HRgDhEeE2ShfrEYp/executions/1323/binary_data/d0c109a9-93fa-491c-b26f-088f308c7c41",
+            "fileSize": "157 kB",
+            "bytes": 157420
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Rooyai Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Job Description Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rooyai Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RESUME ANALYZER",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rooyai Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FORMATTER",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Check Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Prepare Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Prepare Resume": {
+      "main": [
+        [
+          {
+            "node": "Extract Resume Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Store Resume": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram - Check Done": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Stored Resumes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13 - Create Exact Summary SVG": {
+      "main": [
+        [
+          {
+            "node": "14 - SVG to Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "14 - SVG to Binary": {
+      "main": [
+        [
+          {
+            "node": "Convert SVG to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert SVG to PDF": {
+      "main": [
+        [
+          {
+            "node": "PDF to PNG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF to PNG": {
+      "main": [
+        [
+          {
+            "node": "Send Photo Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Resume Text": {
+      "main": [
+        [
+          {
+            "node": "Build Resume Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Resume Data": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Store Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Input Data": {
+      "main": [
+        [
+          {
+            "node": "Job Description Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Stored Resumes": {
+      "main": [
+        [
+          {
+            "node": "Build Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Description Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Parse JD JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JD JSON": {
+      "main": [
+        [
+          {
+            "node": "Prepare Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Candidates": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Resumes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Through Resumes": {
+      "main": [
+        [
+          {
+            "node": "Rank Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RESUME ANALYZER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RESUME ANALYZER": {
+      "main": [
+        [
+          {
+            "node": "Parse Resume Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Resume Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Calculate Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Score": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Resumes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank Candidates": {
+      "main": [
+        [
+          {
+            "node": "Build Recruiter Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Recruiter Report": {
+      "main": [
+        [
+          {
+            "node": "FORMATTER",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "13 - Create Exact Summary SVG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FORMATTER": {
+      "main": [
+        [
+          {
+            "node": "Send Full Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d5707f54-b457-4cd6-a592-6527a9ef12a5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "656413525bc0e1426a0188f7142dbb3b438a58b5ba082ba861d122f24de57004"
+  },
+  "nodeGroups": [],
+  "id": "HRgDhEeE2ShfrEYp",
+  "tags": []
+}
